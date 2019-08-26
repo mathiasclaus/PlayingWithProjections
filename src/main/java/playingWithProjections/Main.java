@@ -19,11 +19,11 @@ public class Main {
     private static class CountEvents {
         private int counter = 0;
 
-        public int getResult() {
+        int getResult() {
             return counter;
         }
 
-        public void projection(Event event) {
+        void projection(Event event) {
             counter++;
         }
     }
