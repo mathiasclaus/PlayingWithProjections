@@ -8,7 +8,6 @@ public class Main {
                 .replay(file);
 
         System.out.printf("number of events: %d%n", projector.getResult());
-
     }
 
     private static String FilePathFrom(String[] args) {
