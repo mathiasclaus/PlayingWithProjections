@@ -2,6 +2,8 @@ package playingWithProjections;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,8 +36,9 @@ public class EventStore {
 
     private List<Event> parse(File file) {
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.readValue(file, new TypeReference<List<Event>>() {});
+            return new ObjectMapper()
+                    .registerModule(new JavaTimeModule())
+                    .readValue(file, new TypeReference<List<Event>>() {});
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
