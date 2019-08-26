@@ -2,7 +2,6 @@ package playingWithProjections;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.io.File;
@@ -29,9 +28,7 @@ public class EventStore {
             for (Consumer<Event> projection : projections) {
                 projection.accept(event);
             }
-
         }
-
     }
 
     private List<Event> parse(File file) {
