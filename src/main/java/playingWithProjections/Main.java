@@ -1,10 +1,16 @@
 package playingWithProjections;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 public class Main {
     public static void main(String[] args) {
         String file = FilePathFrom(args);
-        int result = getResult(file, new CountRegisteredPlayers());
-        System.out.printf("Result: %d%n", result);
+        Map<String, Integer> result = getResult(file, new CountRegisteredPlayersPerMonth());
+        result
+            .forEach((month, playersRegistered) ->
+                System.out.printf("%s: %d%n", month, playersRegistered)
+            );
     }
 
     private static <T> T getResult(String file, Projector<T> projector) {
@@ -43,6 +49,21 @@ public class Main {
         public void projection(Event event) {
             if ("PlayerHasRegistered".equals(event.getType())) {
                 counter++;
+            }
+        }
+    }
+
+    private static class CountRegisteredPlayersPerMonth implements Projector<Map<String, Integer>> {
+        private Map<String, Integer> numberOfPlayersRegisteredPerMonth = new LinkedHashMap<>();
+
+        public Map<String, Integer> getResult() {
+            return numberOfPlayersRegisteredPerMonth;
+        }
+
+        public void projection(Event event) {
+            if ("PlayerHasRegistered".equals(event.getType())) {
+                String monthOfYear = String.format("%s-%s", event.getTimestamp().getYear(), event.getTimestamp().getMonthValue());
+                numberOfPlayersRegisteredPerMonth.compute(monthOfYear, (month, playersRegistered) -> playersRegistered == null ? 1 : playersRegistered + 1);
             }
         }
     }
