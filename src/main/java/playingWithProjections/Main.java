@@ -2,22 +2,20 @@ package playingWithProjections;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Main {
     public static void main(String[] args) {
         String file = FilePathFrom(args);
-        Map<String, Integer> result = getResult(file, new CountRegisteredPlayersPerMonth());
-        result
-            .forEach((month, playersRegistered) ->
-                System.out.printf("%s: %d%n", month, playersRegistered)
-            );
+        String result = getFormattedResult(file, new CountRegisteredPlayersPerMonth());
+        System.out.printf(result);
     }
 
-    private static <T> T getResult(String file, Projector<T> projector) {
+    private static String getFormattedResult(String file, Projector projector) {
         new EventStore(projector::projection)
             .replay(file);
 
-        return projector.getResult();
+        return projector.getFormattedResult();
     }
 
     private static String FilePathFrom(String[] args) {
@@ -27,11 +25,11 @@ public class Main {
         return args[0];
     }
 
-    private static class CountEvents implements Projector<Integer> {
+    private static class CountEvents implements Projector {
         private int counter = 0;
 
-        public Integer getResult() {
-            return counter;
+        public String getFormattedResult() {
+            return String.format("number of events: %d%n", counter);
         }
 
         public void projection(Event event) {
@@ -39,11 +37,11 @@ public class Main {
         }
     }
 
-    private static class CountRegisteredPlayers implements Projector<Integer> {
+    private static class CountRegisteredPlayers implements Projector {
         private int counter = 0;
 
-        public Integer getResult() {
-            return counter;
+        public String getFormattedResult() {
+            return String.format("number of registered players: %d%n", counter);
         }
 
         public void projection(Event event) {
@@ -53,11 +51,13 @@ public class Main {
         }
     }
 
-    private static class CountRegisteredPlayersPerMonth implements Projector<Map<String, Integer>> {
-        private Map<String, Integer> numberOfPlayersRegisteredPerMonth = new LinkedHashMap<>();
+    private static class CountRegisteredPlayersPerMonth implements Projector {
+        private final Map<String, Integer> numberOfPlayersRegisteredPerMonth = new LinkedHashMap<>();
 
-        public Map<String, Integer> getResult() {
-            return numberOfPlayersRegisteredPerMonth;
+        public String getFormattedResult() {
+           return numberOfPlayersRegisteredPerMonth.entrySet().stream()
+                .map((entry) -> String.format("%s: %d", entry.getKey(),entry.getValue()))
+                .collect(Collectors.joining("%n"));
         }
 
         public void projection(Event event) {
