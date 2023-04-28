@@ -3,26 +3,32 @@ package playingWithProjections;
 public class Main {
     public static void main(String[] args) {
         String file = FilePathFrom(args);
-        CountEvents projector = new CountEvents();
-        new EventStore(projector::projection)
-                .replay(file);
+        int result = getResult(file, new CountEvents());
+        System.out.printf("Result: %d%n", result);
+    }
 
-        System.out.printf("number of events: %d%n", projector.getResult());
+    private static int getResult(String file, Projector projector) {
+        new EventStore(projector::projection)
+            .replay(file);
+
+        return projector.getResult();
     }
 
     private static String FilePathFrom(String[] args) {
-        if (args.length < 1) throw new IllegalArgumentException("Please specify a file to replay");
+        if (args.length < 1) {
+            throw new IllegalArgumentException("Please specify a file to replay");
+        }
         return args[0];
     }
 
-    private static class CountEvents {
+    private static class CountEvents implements Projector {
         private int counter = 0;
 
-        int getResult() {
+        public int getResult() {
             return counter;
         }
 
-        void projection(Event event) {
+        public void projection(Event event) {
             counter++;
         }
     }
