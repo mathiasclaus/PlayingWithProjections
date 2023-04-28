@@ -7,7 +7,7 @@ public class Main {
         System.out.printf("Result: %d%n", result);
     }
 
-    private static int getResult(String file, Projector projector) {
+    private static <T> T getResult(String file, Projector<T> projector) {
         new EventStore(projector::projection)
             .replay(file);
 
@@ -21,10 +21,10 @@ public class Main {
         return args[0];
     }
 
-    private static class CountEvents implements Projector {
+    private static class CountEvents implements Projector<Integer> {
         private int counter = 0;
 
-        public int getResult() {
+        public Integer getResult() {
             return counter;
         }
 
@@ -33,10 +33,10 @@ public class Main {
         }
     }
 
-    private static class CountRegisteredPlayers implements Projector {
+    private static class CountRegisteredPlayers implements Projector<Integer> {
         private int counter = 0;
 
-        public int getResult() {
+        public Integer getResult() {
             return counter;
         }
 
